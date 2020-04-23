@@ -1,20 +1,20 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import java.util.List;
 
 public class SearchPageObject extends MainPageObject {
 
     private static final String
-            SKIP_ONBOARDING_BUTTON = "org.wikipedia:id/fragment_onboarding_skip_button",
-            SEARCH_INIT_ELEMENT = "//*[@resource-id='org.wikipedia:id/search_container']//*[@class='android.widget.TextView']",
-            SEARCH_INPUT = "org.wikipedia:id/search_src_text",
-            LIST_OF_ELEMENTS = "org.wikipedia:id/page_list_item_title",
-            SEARCH_CLOSE_BUTTON = "org.wikipedia:id/search_close_btn",
-            SEARCH_RESULT_TITLE_BY_SUBSTRING_TPL = "//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='{SUBSTRING}']",
-            SEARCH_RESULT_DESCRIPTION_BY_SUBSTRING_TPL = "//*[@resource-id='org.wikipedia:id/page_list_item_description'][@text='{SUBSTRING}']";
+            SKIP_ONBOARDING_BUTTON = "id:org.wikipedia:id/fragment_onboarding_skip_button",
+            SEARCH_INIT_ELEMENT = "xpath://*[@resource-id='org.wikipedia:id/search_container']//*[@class='android.widget.TextView']",
+            SEARCH_INPUT = "id:org.wikipedia:id/search_src_text",
+            LIST_OF_ELEMENTS = "id:org.wikipedia:id/page_list_item_title",
+            SEARCH_CLOSE_BUTTON = "id:org.wikipedia:id/search_close_btn",
+            SEARCH_RESULT_TITLE_BY_SUBSTRING_TPL = "xpath://*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='{SUBSTRING}']",
+            SEARCH_RESULT_DESCRIPTION_BY_SUBSTRING_TPL = "xpath://*[@resource-id='org.wikipedia:id/page_list_item_description'][@text='{SUBSTRING}']",
+            DESCRIPTION_TPL = "/../android.widget.TextView[@text='{SUBSTRING}']";
 
     public SearchPageObject(AppiumDriver driver) {
         super(driver);
@@ -23,30 +23,37 @@ public class SearchPageObject extends MainPageObject {
     public void openArticleWithDescription(String description) {
         String descriptionXpath = replaceTemplate(SEARCH_RESULT_DESCRIPTION_BY_SUBSTRING_TPL, description);
         this.waitForElementAndClick(
-                By.xpath(descriptionXpath),
+                descriptionXpath,
                 "Cannot find search result with title: " + descriptionXpath,
                 15);
+    }
+
+    public boolean waitForElementByTitleAndDescription(String title, String description) {
+        String titleXpath = replaceTemplate(SEARCH_RESULT_TITLE_BY_SUBSTRING_TPL, title);
+        String descriptionXpath = replaceTemplate(titleXpath + DESCRIPTION_TPL, description);
+        WebElement titleElement = this.waitForElementPresent(titleXpath,
+                "Cannot find article with title \"" + title + "\" and description \"" + description + "\"", 10);
+        WebElement descriptionElement = this.waitForElementPresent(descriptionXpath,
+                "Cannot find article with title \"" + title + "\" and description \"" + description + "\"", 10);
+        if (titleElement.getText().contains(title) & descriptionElement.getText().contains(description)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void openArticleWithTitle(String title) {
         String titleXpath = replaceTemplate(SEARCH_RESULT_TITLE_BY_SUBSTRING_TPL, title);
         this.waitForElementAndClick(
-                By.xpath(titleXpath),
+                titleXpath,
                 "Cannot find search result with title: " + title,
                 15);
     }
 
     public void waitForSearchResult(String substring) {
         String searchResultXpath = replaceTemplate(SEARCH_RESULT_TITLE_BY_SUBSTRING_TPL, substring);
-        this.waitForElementPresent(By.xpath(searchResultXpath),
+        this.waitForElementPresent(searchResultXpath,
                 "Cannot find search result with substring: " + substring);
-    }
-
-    private static String replaceTemplate(String template, String title, String description) {
-        String xpath = template.replace("{TITLE}", title);
-        String qwe = xpath.replace("{DESCRIPTION}", description);
-        return qwe;
-
     }
 
     private static String replaceTemplate(String template, String substring) {
@@ -55,45 +62,45 @@ public class SearchPageObject extends MainPageObject {
 
     public void initSearchInput() {
         this.waitForElementAndClick(
-                By.xpath(SEARCH_INIT_ELEMENT),
+                SEARCH_INIT_ELEMENT,
                 "Cannot find search button",
                 10);
         this.waitForElementPresent(
-                By.xpath(SEARCH_INIT_ELEMENT),
+                SEARCH_INIT_ELEMENT,
                 "Cannot find search button");
     }
 
     public void typeSearchLine(String searchLine) {
         this.waitForElementAndSendKeys(
-                By.id(SEARCH_INPUT), searchLine,
+                SEARCH_INPUT, searchLine,
                 "Cannot send text in search field",
                 10);
     }
 
     public List<WebElement> getListOfElements() {
         return this.waitAndReturnListOfElements(
-                By.id(LIST_OF_ELEMENTS),
+                LIST_OF_ELEMENTS,
                 "Cannot find the articles",
                 15);
     }
 
     public boolean listOfElementsIsEmpty() {
         return this.waitForElementNotPresent(
-                By.id(LIST_OF_ELEMENTS),
+                LIST_OF_ELEMENTS,
                 "Articles is still present on the page",
                 5);
     }
 
     public void resetSearch() {
         this.waitForElementAndClick(
-                By.id(SEARCH_CLOSE_BUTTON),
+                SEARCH_CLOSE_BUTTON,
                 "Cannot find X button",
                 10);
     }
 
     public void skipOnboarding() {
         this.waitForElementAndClick(
-                By.id(SKIP_ONBOARDING_BUTTON),
+                SKIP_ONBOARDING_BUTTON,
                 "Cannot find 'Skip' button",
                 10);
     }

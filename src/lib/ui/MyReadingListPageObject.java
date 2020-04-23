@@ -1,14 +1,13 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
 
 public class MyReadingListPageObject extends MainPageObject {
 
     private static final String
-            ARTICLE = "org.wikipedia:id/page_list_item_title",
-            PATH_TO_ARTICLE_TPL = "//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='{SUBSTRING}']",
-            PATH_TO_READING_LIST_TPL = "//*[@resource-id='org.wikipedia:id/item_title'][@text='{SUBSTRING}']";
+            ARTICLE = "id:org.wikipedia:id/page_list_item_title",
+            PATH_TO_ARTICLE_TPL = "xpath://*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='{SUBSTRING}']",
+            PATH_TO_READING_LIST_TPL = "xpath://*[@resource-id='org.wikipedia:id/item_title'][@text='{SUBSTRING}']";
 
     public MyReadingListPageObject(AppiumDriver driver) {
         super(driver);
@@ -16,7 +15,7 @@ public class MyReadingListPageObject extends MainPageObject {
 
     public String getNameOfArticle() {
         return this.waitForElementAndGetAttribute(
-                By.id(ARTICLE),
+                ARTICLE,
                 "text",
                 "Cannot get attribute text",
                 10);
@@ -25,7 +24,7 @@ public class MyReadingListPageObject extends MainPageObject {
     public void openArticleByName(String articleName) {
         String article = replaceTemplate(PATH_TO_ARTICLE_TPL, articleName);
         this.waitForElementAndClick(
-                By.xpath(article),
+                article,
                 "Cannot click of article",
                 10);
     }
@@ -33,7 +32,7 @@ public class MyReadingListPageObject extends MainPageObject {
     public void deleteArticleByName(String articleName) {
         String article = replaceTemplate(PATH_TO_ARTICLE_TPL, articleName);
         this.swipeElementToLeft(
-                By.xpath(article),
+                article,
                 "Cannot swipe element to left");
     }
 
@@ -43,7 +42,7 @@ public class MyReadingListPageObject extends MainPageObject {
 
     public int getCountOfArticles() {
         return this.waitAndReturnListOfElements(
-                By.id("org.wikipedia:id/page_list_item_title"),
+                ARTICLE,
                 "Cannot find list of articles",
                 10).size();
     }
@@ -51,7 +50,7 @@ public class MyReadingListPageObject extends MainPageObject {
     public void openReadingList(String readingListName) {
         String readingList = replaceTemplate(PATH_TO_READING_LIST_TPL, readingListName);
         this.waitForElementAndClick(
-                By.xpath(readingList),
+                readingList,
                 "Cannot find list for saved articles",
                 10);
     }
